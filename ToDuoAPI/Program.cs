@@ -5,7 +5,7 @@ using ToDuoAPI.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("ToDuoConnectionStrings");
+var connectionString = builder.Configuration.GetConnectionString("ToDuoConnectionString");
 builder.Services.AddDbContext<ToDuoDbContext>(options =>
 {
     options.UseSqlServer(connectionString);

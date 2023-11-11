@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ToDuoAPI.Models;
 
 namespace ToDuoAPI.Data
 {
@@ -8,5 +9,7 @@ namespace ToDuoAPI.Data
         {
 
         }  
+
+        public DbSet<ToDuoUsers> ToDuoUsers { get; set; }
     }
 }
