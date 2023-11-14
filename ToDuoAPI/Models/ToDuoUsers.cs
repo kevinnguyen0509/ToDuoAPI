@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ToDuoAPI.Models
 {
@@ -49,6 +50,9 @@ namespace ToDuoAPI.Models
 
         [MaxLength(10)]
         public string FriendTen { get; set; }
+
+        [NotMapped]
+        public string Result { get; set; }
 
     }
 }
