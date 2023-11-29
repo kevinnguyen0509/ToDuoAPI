@@ -18,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<Signup>();
+builder.Services.AddScoped<LoginService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll",

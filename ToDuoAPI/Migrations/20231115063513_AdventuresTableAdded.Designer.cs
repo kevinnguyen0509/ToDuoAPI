@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDuoAPI.Data;
 
@@ -11,9 +12,11 @@ using ToDuoAPI.Data;
 namespace ToDuoAPI.Migrations
 {
     [DbContext(typeof(ToDuoDbContext))]
-    partial class ToDuoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231115063513_AdventuresTableAdded")]
+    partial class AdventuresTableAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,29 +33,20 @@ namespace ToDuoAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("City")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Hours")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImageURL")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                    b.Property<string>("Location")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("SwipeCount")
+                    b.Property<int>("OwnerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Tags")
@@ -63,72 +57,15 @@ namespace ToDuoAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("ToDuoCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToDuoStatesID")
-                        .HasColumnType("int");
-
                     b.Property<string>("WebsiteURL")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("swipeCount")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
-
-                    b.HasIndex("City");
-
-                    b.HasIndex("ToDuoCategoryId");
-
-                    b.HasIndex("ToDuoStatesID");
 
                     b.ToTable("Adventures");
-                });
-
-            modelBuilder.Entity("ToDuoAPI.Models.ToDuoCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ToDuoCategories");
-                });
-
-            modelBuilder.Entity("ToDuoAPI.Models.ToDuoCity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ToDuoCity");
-                });
-
-            modelBuilder.Entity("ToDuoAPI.Models.ToDuoStates", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ToDuoStates");
                 });
 
             modelBuilder.Entity("ToDuoAPI.Models.ToDuoUsers", b =>
@@ -204,48 +141,6 @@ namespace ToDuoAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ToDuoUsers");
-                });
-
-            modelBuilder.Entity("ToDuoAPI.Models.Adventures", b =>
-                {
-                    b.HasOne("ToDuoAPI.Models.ToDuoCity", "ToDuoCity")
-                        .WithMany("Adventures")
-                        .HasForeignKey("City")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ToDuoAPI.Models.ToDuoCategory", "ToDuoCategory")
-                        .WithMany("Adventures")
-                        .HasForeignKey("ToDuoCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ToDuoAPI.Models.ToDuoStates", "ToDuoStates")
-                        .WithMany("Adventures")
-                        .HasForeignKey("ToDuoStatesID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ToDuoCategory");
-
-                    b.Navigation("ToDuoCity");
-
-                    b.Navigation("ToDuoStates");
-                });
-
-            modelBuilder.Entity("ToDuoAPI.Models.ToDuoCategory", b =>
-                {
-                    b.Navigation("Adventures");
-                });
-
-            modelBuilder.Entity("ToDuoAPI.Models.ToDuoCity", b =>
-                {
-                    b.Navigation("Adventures");
-                });
-
-            modelBuilder.Entity("ToDuoAPI.Models.ToDuoStates", b =>
-                {
-                    b.Navigation("Adventures");
                 });
 #pragma warning restore 612, 618
         }

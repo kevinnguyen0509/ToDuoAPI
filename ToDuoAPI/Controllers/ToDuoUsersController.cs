@@ -17,11 +17,13 @@ namespace ToDuoAPI.Controllers
     {
         private readonly ToDuoDbContext _context;
         private readonly Signup _signup;
+        private readonly LoginService _login;
 
-        public ToDuoUsersController(ToDuoDbContext context, Signup signup)
+        public ToDuoUsersController(ToDuoDbContext context, Signup signup, LoginService login)
         {
             _context = context;
             _signup = signup;
+            _login= login;
         }
 
         // GET: api/ToDuoUsers
@@ -44,6 +46,8 @@ namespace ToDuoAPI.Controllers
 
             return toDuoUsers;
         }
+
+
 
         // PUT: api/ToDuoUsers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -84,6 +88,26 @@ namespace ToDuoAPI.Controllers
             toDuoUsers =  await _signup.SignUpNewUser(toDuoUsers);
             return CreatedAtAction("GetToDuoUsers", new { id = toDuoUsers.Id }, toDuoUsers);
         }
+
+
+        // POST: api/Login
+        [HttpPost]
+        [Route("login")]
+        public async Task<ActionResult<ToDuoUsers>> Login(Login login)
+        {
+            try
+            {
+                ToDuoUsers user = await _login.AuthenticateCredentials(login.Email, login.Password);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details
+                // Return a more descriptive error message or HTTP status code
+                return StatusCode(500, ex.Message); // or return a custom error object
+            }
+        }
+
 
         // DELETE: api/ToDuoUsers/5
         [HttpDelete("{id}")]

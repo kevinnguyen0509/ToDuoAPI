@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDuoAPI.Data;
 
@@ -11,9 +12,11 @@ using ToDuoAPI.Data;
 namespace ToDuoAPI.Migrations
 {
     [DbContext(typeof(ToDuoDbContext))]
-    partial class ToDuoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231128214414_updatedStateIDToBeForeignKey")]
+    partial class updatedStateIDToBeForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,8 +37,9 @@ namespace ToDuoAPI.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("City")
-                        .HasColumnType("int");
+                    b.Property<string>("City")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -50,6 +54,9 @@ namespace ToDuoAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StateID")
                         .HasColumnType("int");
 
                     b.Property<int>("SwipeCount")
@@ -67,6 +74,7 @@ namespace ToDuoAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("ToDuoStatesID")
+                        .HasMaxLength(50)
                         .HasColumnType("int");
 
                     b.Property<string>("WebsiteURL")
@@ -74,11 +82,9 @@ namespace ToDuoAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("City");
+                    b.HasIndex("StateID");
 
                     b.HasIndex("ToDuoCategoryId");
-
-                    b.HasIndex("ToDuoStatesID");
 
                     b.ToTable("Adventures");
                 });
@@ -208,11 +214,9 @@ namespace ToDuoAPI.Migrations
 
             modelBuilder.Entity("ToDuoAPI.Models.Adventures", b =>
                 {
-                    b.HasOne("ToDuoAPI.Models.ToDuoCity", "ToDuoCity")
+                    b.HasOne("ToDuoAPI.Models.ToDuoStates", "ToDuoStates")
                         .WithMany("Adventures")
-                        .HasForeignKey("City")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StateID");
 
                     b.HasOne("ToDuoAPI.Models.ToDuoCategory", "ToDuoCategory")
                         .WithMany("Adventures")
@@ -220,25 +224,12 @@ namespace ToDuoAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ToDuoAPI.Models.ToDuoStates", "ToDuoStates")
-                        .WithMany("Adventures")
-                        .HasForeignKey("ToDuoStatesID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ToDuoCategory");
-
-                    b.Navigation("ToDuoCity");
 
                     b.Navigation("ToDuoStates");
                 });
 
             modelBuilder.Entity("ToDuoAPI.Models.ToDuoCategory", b =>
-                {
-                    b.Navigation("Adventures");
-                });
-
-            modelBuilder.Entity("ToDuoAPI.Models.ToDuoCity", b =>
                 {
                     b.Navigation("Adventures");
                 });
