@@ -116,6 +116,55 @@ namespace ToDuoAPI.Controllers
             return adventures;
         }
 
+
+        // POST: api/Adventures
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        [Route("filter")]
+        public async Task<ActionResult<IEnumerable<Adventures>>> FilterSearch(FilterDto filterDto)
+        {
+            var category = await _context.ToDuoCategories.FirstOrDefaultAsync(db => db.Name == filterDto.Category);
+            var state = await _context.ToDuoStates.FirstOrDefaultAsync(db => db.Name == filterDto.State);
+            var city = await _context.ToDuoCity.FirstOrDefaultAsync(db => db.Name == filterDto.City);
+
+            var tags = filterDto.Tags?.Split(new[] { ',', '(', ')' }, StringSplitOptions.RemoveEmptyEntries)
+                                      .Select(tag => tag.Trim().Replace(" ", ""))
+                                      .Where(tag => !string.IsNullOrEmpty(tag))
+                                      .ToList();
+
+
+            IQueryable<Adventures> query = _context.Adventures;
+
+            if (category != null)
+            {
+                query = query.Where(db => db.ToDuoCategoryId == category.Id);
+            }
+
+            if (state != null)
+            {
+                query = query.Where(db => db.ToDuoStatesID == state.Id);
+            }
+
+            if (city != null)
+            {
+                query = query.Where(db => db.City == city.Id);
+            }
+
+            if (tags != null && tags.Count > 0)
+            {
+                foreach (var tag in tags)
+                {
+                    query = query.Where(db => db.Title.Contains(tag) || db.Description.Contains(tag) || db.Tags.Contains(tag));
+                }
+            }
+
+            var adventures = await query.Take(300).ToListAsync();
+
+            return Ok(adventures);
+
+        }
+
+
         // DELETE: api/Adventures/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAdventures(int id)
