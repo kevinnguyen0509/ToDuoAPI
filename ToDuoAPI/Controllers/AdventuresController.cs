@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
 using ToDuoAPI.Models;
 using ToDuoAPI.Models.DataTransferObjects;
@@ -17,49 +19,30 @@ namespace ToDuoAPI.Controllers
     public class AdventuresController : ControllerBase
     {
         private readonly ToDuoDbContext _context;
+        private readonly IMapper _mapper;
+        private readonly IAdventures _adventures;
 
-        public AdventuresController(ToDuoDbContext context)
+        public AdventuresController(ToDuoDbContext context, IMapper mapper, IAdventures adventures)
         {
             _context = context;
+            this._mapper = mapper;
+            this._adventures = adventures;
         }
 
         // GET: api/Adventures
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AdventureDto>>> GetAdventures()
         {
-            var adventures = await _context.Adventures
-            .Include(a => a.ToDuoCategory)
-            .Select(a => new AdventureDto
-            {
-                Id = a.Id,
-                OwnerId = a.OwnerId,
-                Title = a.Title,
-                ImageURL = a.ImageURL,
-                Description = a.Description,
-                WebsiteURL = a.WebsiteURL,
-                CreatedDate = a.CreatedDate,
-                Address = a.Address,
-                City = a.ToDuoCity.Name,
-                State = a.ToDuoStates.Name,
-                Tags = a.Tags,
-                Hours = a.Hours,
-                SwipeCount = a.SwipeCount,
-                CategoryName = a.ToDuoCategory.Name // Only the category name
-            })
-            .OrderByDescending(db => db.Id)
-            .Take(200)
-            .ToListAsync();
-
+            var adventures = await _adventures.GetAdventures(300);
             ArrayListHelper.Shuffle(adventures);
             return adventures;
-            //return await _context.Adventures.Include(db => db.ToDuoCategory).ToListAsync();
         }
 
         // GET: api/Adventures/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Adventures>> GetAdventures(int id)
         {
-            var adventures = await _context.Adventures.FindAsync(id);
+            var adventures = await _adventures.GetAsync(id);
 
             if (adventures == null)
             {
@@ -78,12 +61,16 @@ namespace ToDuoAPI.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(adventures).State = EntityState.Modified;
+            var adventure = await _adventures.GetAsync(id);
+            //_context.Entry(adventures).State = EntityState.Modified;
+            if(adventure == null)
+            {
+                return NotFound();
+            }
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _adventures.UpdateAsync(adventures);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -105,13 +92,11 @@ namespace ToDuoAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Adventures>> PostAdventures(Adventures adventures)
         {
-            Adventures adventure = _context.Adventures.FirstOrDefault(db => db.Address == adventures.Address);
-            if (adventure == null)
+            bool adventureExists = await _adventures.Exists(adventures.Address);
+            if (!adventureExists)
             {
-                _context.Adventures.Add(adventures);
-                await _context.SaveChangesAsync();
+                await _adventures.AddAsync(adventures);
             }
-
 
             return adventures;
         }
@@ -123,43 +108,7 @@ namespace ToDuoAPI.Controllers
         [Route("filter")]
         public async Task<ActionResult<IEnumerable<Adventures>>> FilterSearch(FilterDto filterDto)
         {
-            var category = await _context.ToDuoCategories.FirstOrDefaultAsync(db => db.Name == filterDto.Category);
-            var state = await _context.ToDuoStates.FirstOrDefaultAsync(db => db.Name == filterDto.State);
-            var city = await _context.ToDuoCity.FirstOrDefaultAsync(db => db.Name == filterDto.City);
-
-            var tags = filterDto.Tags?.Split(new[] { ',', '(', ')' }, StringSplitOptions.RemoveEmptyEntries)
-                                      .Select(tag => tag.Trim().Replace(" ", ""))
-                                      .Where(tag => !string.IsNullOrEmpty(tag))
-                                      .ToList();
-
-
-            IQueryable<Adventures> query = _context.Adventures;
-
-            if (category != null)
-            {
-                query = query.Where(db => db.ToDuoCategoryId == category.Id);
-            }
-
-            if (state != null)
-            {
-                query = query.Where(db => db.ToDuoStatesID == state.Id);
-            }
-
-            if (city != null)
-            {
-                query = query.Where(db => db.City == city.Id);
-            }
-
-            if (tags != null && tags.Count > 0)
-            {
-                foreach (var tag in tags)
-                {
-                    query = query.Where(db => db.Title.Contains(tag) || db.Description.Contains(tag) || db.Tags.Contains(tag));
-                }
-            }
-
-            var adventures = await query.Take(300).ToListAsync();
-
+            var adventures = await _adventures.FilteredSearch(filterDto, 300);
             return Ok(adventures);
 
         }
@@ -169,15 +118,13 @@ namespace ToDuoAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAdventures(int id)
         {
-            var adventures = await _context.Adventures.FindAsync(id);
+            var adventures = await _adventures.GetAsync(id);
             if (adventures == null)
             {
                 return NotFound();
             }
 
-            _context.Adventures.Remove(adventures);
-            await _context.SaveChangesAsync();
-
+            await _adventures.DeleteAsync(id);
             return NoContent();
         }
 

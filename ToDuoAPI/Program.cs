@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using ToDuoAPI.Configurations;
+using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
+using ToDuoAPI.Repository;
 using ToDuoAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,9 +20,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<Signup>();
-builder.Services.AddScoped<LoginService>();
-
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll",
         b => b.AllowAnyHeader()
@@ -29,6 +29,13 @@ builder.Services.AddCors(options => {
 
 //This is for Seq
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
+builder.Services.AddAutoMapper(typeof(MapperConfig));
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IAdventures, AdventuresRespository>();
+builder.Services.AddScoped<ICategory, CategoryRepository>();
+builder.Services.AddScoped<ICities, CityRepository>();
+builder.Services.AddScoped<IState, StateRepository>();
+builder.Services.AddScoped<IUser, UserRepository>();
 
 var app = builder.Build();
 

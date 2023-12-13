@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
 using ToDuoAPI.Models;
 
@@ -15,25 +16,26 @@ namespace ToDuoAPI.Controllers
     public class ToDuoStatesController : ControllerBase
     {
         private readonly ToDuoDbContext _context;
+        private readonly IState _state;
 
-        public ToDuoStatesController(ToDuoDbContext context)
+        public ToDuoStatesController(ToDuoDbContext context, IState state)
         {
             _context = context;
+            _state = state;
         }
 
         // GET: api/ToDuoStates
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ToDuoStates>>> GetToDuoStates()
         {
-            return await _context.ToDuoStates.ToListAsync();
+            return await _state.GetAllAsync();
         }
 
         // GET: api/ToDuoStates/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ToDuoStates>> GetToDuoStates(int id)
         {
-            var toDuoStates = await _context.ToDuoStates.FindAsync(id);
-
+            var toDuoStates = await _state.GetAsync(id);
             if (toDuoStates == null)
             {
                 return NotFound();
@@ -52,11 +54,15 @@ namespace ToDuoAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(toDuoStates).State = EntityState.Modified;
+            bool stateExists = await _state.Exists(id);
+            if (!stateExists)
+            {
+                return NotFound();
+            }
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _state.UpdateAsync(toDuoStates);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -69,7 +75,6 @@ namespace ToDuoAPI.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
@@ -78,9 +83,7 @@ namespace ToDuoAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<ToDuoStates>> PostToDuoStates(ToDuoStates toDuoStates)
         {
-            _context.ToDuoStates.Add(toDuoStates);
-            await _context.SaveChangesAsync();
-
+            await _state.AddAsync(toDuoStates);
             return CreatedAtAction("GetToDuoStates", new { id = toDuoStates.Id }, toDuoStates);
         }
 
@@ -88,15 +91,13 @@ namespace ToDuoAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteToDuoStates(int id)
         {
-            var toDuoStates = await _context.ToDuoStates.FindAsync(id);
+            var toDuoStates = await _state.GetAsync(id);
             if (toDuoStates == null)
             {
                 return NotFound();
             }
 
-            _context.ToDuoStates.Remove(toDuoStates);
-            await _context.SaveChangesAsync();
-
+            await _state.DeleteAsync(id);
             return NoContent();
         }
 

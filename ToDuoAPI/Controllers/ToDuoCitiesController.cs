@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
 using ToDuoAPI.Models;
 
@@ -15,6 +16,7 @@ namespace ToDuoAPI.Controllers
     public class ToDuoCitiesController : ControllerBase
     {
         private readonly ToDuoDbContext _context;
+        private readonly ICities _city;
 
         public ToDuoCitiesController(ToDuoDbContext context)
         {
@@ -25,20 +27,19 @@ namespace ToDuoAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ToDuoCity>>> GetToDuoCity()
         {
-            return await _context.ToDuoCity.ToListAsync();
+            return await _city.GetAllAsync();
         }
 
         // GET: api/ToDuoCities/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ToDuoCity>> GetToDuoCity(int id)
         {
-            var toDuoCity = await _context.ToDuoCity.FindAsync(id);
+            var toDuoCity = await _city.GetAsync(id);
 
             if (toDuoCity == null)
             {
                 return NotFound();
             }
-
             return toDuoCity;
         }
 
@@ -52,11 +53,15 @@ namespace ToDuoAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(toDuoCity).State = EntityState.Modified;
-
+            var city = await _city.GetAsync(id);
+            if (city == null)
+            {
+                return NotFound();
+            }
+            
             try
             {
-                await _context.SaveChangesAsync();
+                await _city.UpdateAsync(city);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -69,7 +74,6 @@ namespace ToDuoAPI.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
@@ -78,9 +82,7 @@ namespace ToDuoAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<ToDuoCity>> PostToDuoCity(ToDuoCity toDuoCity)
         {
-            _context.ToDuoCity.Add(toDuoCity);
-            await _context.SaveChangesAsync();
-
+            await _city.AddAsync(toDuoCity);
             return CreatedAtAction("GetToDuoCity", new { id = toDuoCity.Id }, toDuoCity);
         }
 
@@ -88,7 +90,7 @@ namespace ToDuoAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteToDuoCity(int id)
         {
-            var toDuoCity = await _context.ToDuoCity.FindAsync(id);
+            var toDuoCity = await _city.GetAsync(id);
             if (toDuoCity == null)
             {
                 return NotFound();

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
 using ToDuoAPI.Models;
 
@@ -15,30 +16,32 @@ namespace ToDuoAPI.Controllers
     public class ToDuoCategoriesController : ControllerBase
     {
         private readonly ToDuoDbContext _context;
+        private readonly ICategory _category;
 
-        public ToDuoCategoriesController(ToDuoDbContext context)
+        public ToDuoCategoriesController(ToDuoDbContext context, ICategory category)
         {
             _context = context;
+            _category = category;
         }
 
         // GET: api/ToDuoCategories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ToDuoCategory>>> GetToDuoCategories()
         {
-            return await _context.ToDuoCategories.ToListAsync();
+            return await _category.GetAllAsync();
         }
 
         // GET: api/ToDuoCategories/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ToDuoCategory>> GetToDuoCategory(int id)
         {
-            var toDuoCategory = await _context.ToDuoCategories.FindAsync(id);
+            bool categoryExists = await _category.Exists(id);    
 
-            if (toDuoCategory == null)
+            if (!categoryExists)
             {
                 return NotFound();
             }
-
+            var toDuoCategory = await _category.GetAsync(id);
             return toDuoCategory;
         }
 
@@ -52,11 +55,14 @@ namespace ToDuoAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(toDuoCategory).State = EntityState.Modified;
-
+            var category = await _category.GetAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
             try
             {
-                await _context.SaveChangesAsync();
+                await _category.UpdateAsync(category);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -69,7 +75,6 @@ namespace ToDuoAPI.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
@@ -78,9 +83,7 @@ namespace ToDuoAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<ToDuoCategory>> PostToDuoCategory(ToDuoCategory toDuoCategory)
         {
-            _context.ToDuoCategories.Add(toDuoCategory);
-            await _context.SaveChangesAsync();
-
+            await _category.AddAsync(toDuoCategory);
             return CreatedAtAction("GetToDuoCategory", new { id = toDuoCategory.Id }, toDuoCategory);
         }
 
@@ -88,15 +91,14 @@ namespace ToDuoAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteToDuoCategory(int id)
         {
-            var toDuoCategory = await _context.ToDuoCategories.FindAsync(id);
-            if (toDuoCategory == null)
+
+            bool categoryExists = await _category.Exists(id);
+            if (!categoryExists)
             {
                 return NotFound();
             }
 
-            _context.ToDuoCategories.Remove(toDuoCategory);
-            await _context.SaveChangesAsync();
-
+            await _category.DeleteAsync(id);
             return NoContent();
         }
 

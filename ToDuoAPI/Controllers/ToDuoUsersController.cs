@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
 using ToDuoAPI.Models;
 using ToDuoAPI.Service;
@@ -15,29 +16,27 @@ namespace ToDuoAPI.Controllers
     [ApiController]
     public class ToDuoUsersController : ControllerBase
     {
-        private readonly ToDuoDbContext _context;
-        private readonly Signup _signup;
-        private readonly LoginService _login;
+        private readonly IUser _user;
+/*        private readonly Signup _signup;
+        private readonly LoginService _login;*/
 
-        public ToDuoUsersController(ToDuoDbContext context, Signup signup, LoginService login)
+        public ToDuoUsersController(ToDuoDbContext context, IUser user)
         {
-            _context = context;
-            _signup = signup;
-            _login= login;
+            _user = user;
         }
 
         // GET: api/ToDuoUsers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ToDuoUsers>>> GetToDuoUsers()
         {
-            return await _context.ToDuoUsers.ToListAsync();
+            return await _user.GetAllAsync();
         }
 
         // GET: api/ToDuoUsers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ToDuoUsers>> GetToDuoUsers(int id)
         {
-            var toDuoUsers = await _context.ToDuoUsers.FindAsync(id);
+            var toDuoUsers = await _user.GetAsync(id);
 
             if (toDuoUsers == null)
             {
@@ -59,15 +58,20 @@ namespace ToDuoAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(toDuoUsers).State = EntityState.Modified;
+            bool userExists = await _user.Exists(id);
+            if (!userExists)
+            {
+                return NotFound();
+            }
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _user.UpdateAsync(toDuoUsers);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ToDuoUsersExists(id))
+                bool exists = await _user.Exists(id);
+                if (!exists)
                 {
                     return NotFound();
                 }
@@ -85,7 +89,7 @@ namespace ToDuoAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<ToDuoUsers>> PostToDuoUsers(ToDuoUsers toDuoUsers)
         {
-            toDuoUsers =  await _signup.SignUpNewUser(toDuoUsers);
+            toDuoUsers =  await _user.SignUpNewUser(toDuoUsers);
             return CreatedAtAction("GetToDuoUsers", new { id = toDuoUsers.Id }, toDuoUsers);
         }
 
@@ -97,7 +101,7 @@ namespace ToDuoAPI.Controllers
         {
             try
             {
-                ToDuoUsers user = await _login.AuthenticateCredentials(login.Email, login.Password);
+                ToDuoUsers user = await _user.AuthenticateCredentials(login.Email, login.Password);
                 return user;
             }
             catch (Exception ex)
@@ -113,21 +117,15 @@ namespace ToDuoAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteToDuoUsers(int id)
         {
-            var toDuoUsers = await _context.ToDuoUsers.FindAsync(id);
+            var toDuoUsers = await _user.GetAsync(id);
             if (toDuoUsers == null)
             {
                 return NotFound();
             }
 
-            _context.ToDuoUsers.Remove(toDuoUsers);
-            await _context.SaveChangesAsync();
-
+            await _user.DeleteAsync(id);
             return NoContent();
         }
 
-        private bool ToDuoUsersExists(int id)
-        {
-            return _context.ToDuoUsers.Any(e => e.Id == id);
-        }
     }
 }
