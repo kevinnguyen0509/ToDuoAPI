@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using ToDuoAPI.Configurations;
 using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
+using ToDuoAPI.Models;
 using ToDuoAPI.Repository;
 using ToDuoAPI.Service;
 
@@ -14,6 +17,10 @@ builder.Services.AddDbContext<ToDuoDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
+
+builder.Services.AddIdentity<ToDuoUsers, IdentityRole<int>>()
+    .AddRoles<IdentityRole<int>>()
+    .AddEntityFrameworkStores<ToDuoDbContext>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

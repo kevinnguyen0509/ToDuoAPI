@@ -1,12 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ToDuoAPI.Models
 {
-    public class ToDuoUsers
+    public class ToDuoUsers : IdentityUser<int>
     {
-        public int Id { get; set; }
-        public string Email { get; set; }
+        
+/*        public int Id { get; set; }
+        public string Email { get; set; }*/
         public string Password { get; set; }
 
         [MaxLength(50)]
