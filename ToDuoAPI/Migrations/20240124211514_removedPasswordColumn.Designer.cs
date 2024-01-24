@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDuoAPI.Data;
 
@@ -11,9 +12,11 @@ using ToDuoAPI.Data;
 namespace ToDuoAPI.Migrations
 {
     [DbContext(typeof(ToDuoDbContext))]
-    partial class ToDuoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240124211514_removedPasswordColumn")]
+    partial class removedPasswordColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -6,13 +6,6 @@ namespace ToDuoAPI.Models
 {
     public class ToDuoUsers : IdentityUser<int>
     {
-        
-/*        public int Id { get; set; }
-        public string Email { get; set; }*/
-        public string Password { get; set; }
-
-        [MaxLength(50)]
-        public string Salt { get; set; }
 
         [MaxLength(20)]
         public string PartnerId { get; set; }

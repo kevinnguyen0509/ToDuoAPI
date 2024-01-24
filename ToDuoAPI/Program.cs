@@ -42,7 +42,7 @@ builder.Services.AddScoped<IAdventures, AdventuresRespository>();
 builder.Services.AddScoped<ICategory, CategoryRepository>();
 builder.Services.AddScoped<ICities, CityRepository>();
 builder.Services.AddScoped<IState, StateRepository>();
-builder.Services.AddScoped<IUser, UserRepository>();
+builder.Services.AddScoped<IAuthManager, AuthManager>();
 
 var app = builder.Build();
 

@@ -4,19 +4,21 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ToDuoAPI.Data.Configurations
 {
-    public class RoleConfiguration : IEntityTypeConfiguration<IdentityRole>
+    public class RoleConfiguration : IEntityTypeConfiguration<IdentityRole<int>>
     {
-        public void Configure(EntityTypeBuilder<IdentityRole> builder)
+        public void Configure(EntityTypeBuilder<IdentityRole<int>> builder)
         {
             builder.HasData(
-                new IdentityRole
+                new IdentityRole<int>
                 { 
+                    Id = 1,
                     Name = "Administrator",
                     NormalizedName = "ADMINISTRATOR",
                 },
 
-                new IdentityRole
+                new IdentityRole<int>
                 {
+                    Id = 2,
                     Name = "User",
                     NormalizedName = "USER"
                 }

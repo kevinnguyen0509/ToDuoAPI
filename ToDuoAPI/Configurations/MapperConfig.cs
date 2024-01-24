@@ -10,7 +10,7 @@ namespace ToDuoAPI.Configurations
         public MapperConfig()
         {
             CreateMap<Adventures, AdventureDto>().ReverseMap();
-            CreateMap<ApiUserDTO, ApiUserDTO>().ReverseMap();
+            CreateMap<ToDuoUsers, ApiUserDTO>().ReverseMap();
         }
     }
 }
