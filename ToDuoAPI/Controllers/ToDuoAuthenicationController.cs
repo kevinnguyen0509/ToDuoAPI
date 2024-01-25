@@ -37,5 +37,22 @@ namespace ToDuoAPI.Controllers
 
             return Ok();
         }
+
+        // POST: api/ToDuoAuthenication/login
+        [HttpPost]
+        [Route("login")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> login([FromBody] ApiUserDTO apiUserDTO)
+        {
+            var isValidUser = await _authManager.Login(apiUserDTO);
+
+            if (!isValidUser)
+            {
+                return Unauthorized();
+            }
+
+            return Ok();
+        }
     }
 }

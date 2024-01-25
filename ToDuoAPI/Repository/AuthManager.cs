@@ -17,6 +17,24 @@ namespace ToDuoAPI.Repository
             this._mapper = mapper;
             this._userManager = userManger;
         }
+
+        public async Task<bool> Login(ApiUserDTO userDTO)
+        {
+            bool isValid = false;
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(userDTO.Email);
+                var validPassword = await _userManager.CheckPasswordAsync(user, userDTO.Password);
+                if (validPassword && user != null) 
+                isValid = true;
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return isValid;
+        }
+
         public async Task<IEnumerable<IdentityError>> RegisterUser(ApiUserDTO userDTO)
         {
             var user = _mapper.Map<ToDuoUsers>(userDTO);
