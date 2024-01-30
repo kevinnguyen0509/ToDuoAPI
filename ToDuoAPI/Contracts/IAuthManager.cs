@@ -6,6 +6,6 @@ namespace ToDuoAPI.Contracts
     public interface IAuthManager
     {
         Task<IEnumerable<IdentityError>> RegisterUser(ApiUserDTO userDTO);
-        Task<bool> Login(ApiUserDTO userDTO);
+        Task<AuthResponseDTO> Login(ApiUserDTO userDTO);
     }
 }

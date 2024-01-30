@@ -47,12 +47,12 @@ namespace ToDuoAPI.Controllers
         {
             var isValidUser = await _authManager.Login(apiUserDTO);
 
-            if (!isValidUser)
+            if (isValidUser == null)
             {
                 return Unauthorized();
             }
 
-            return Ok();
+            return Ok(isValidUser);
         }
     }
 }
