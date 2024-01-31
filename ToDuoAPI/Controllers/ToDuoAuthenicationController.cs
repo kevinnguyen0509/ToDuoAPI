@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ToDuoAPI.Contracts;
 using ToDuoAPI.Models.DataTransferObjects;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ToDuoAPI.Controllers
 {
@@ -53,6 +54,23 @@ namespace ToDuoAPI.Controllers
             }
 
             return Ok(isValidUser);
+        }
+
+        // POST: api/ToDuoAuthenication/refreshtoken
+        [HttpPost]
+        [Route("refreshtoken")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> refreshtoken([FromBody] AuthResponseDTO request)
+        {
+            var authResponse = await _authManager.VerifyRefreshToken(request);
+
+            if (authResponse == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(authResponse);
         }
     }
 }

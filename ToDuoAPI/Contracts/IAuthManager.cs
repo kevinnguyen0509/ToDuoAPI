@@ -7,5 +7,7 @@ namespace ToDuoAPI.Contracts
     {
         Task<IEnumerable<IdentityError>> RegisterUser(ApiUserDTO userDTO);
         Task<AuthResponseDTO> Login(ApiUserDTO userDTO);
+        Task<string> CreateRefreshToken();
+        Task<AuthResponseDTO> VerifyRefreshToken(AuthResponseDTO request);
     }
 }

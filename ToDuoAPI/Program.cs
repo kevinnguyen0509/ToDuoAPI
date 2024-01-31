@@ -9,6 +9,7 @@ using ToDuoAPI.Configurations;
 using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
 using ToDuoAPI.Models;
+using ToDuoAPI.Models.DataTransferObjects;
 using ToDuoAPI.Repository;
 using ToDuoAPI.Service;
 
@@ -23,7 +24,9 @@ builder.Services.AddDbContext<ToDuoDbContext>(options =>
 
 builder.Services.AddIdentity<ToDuoUsers, IdentityRole<int>>()
     .AddRoles<IdentityRole<int>>()
-    .AddEntityFrameworkStores<ToDuoDbContext>();
+    .AddTokenProvider<DataProtectorTokenProvider<ToDuoUsers>>("ToDuoAPI")
+    .AddEntityFrameworkStores<ToDuoDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -78,7 +81,7 @@ app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
-
+app.UseAuthentication(); //Need to use this when building JWT
 app.UseAuthorization();
 
 app.MapControllers();
