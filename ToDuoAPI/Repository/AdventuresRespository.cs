@@ -29,7 +29,7 @@ namespace ToDuoAPI.Repository
         {
             var category = await _context.ToDuoCategories.FirstOrDefaultAsync(db => db.Name == filterDto.Category);
             var state = await _context.ToDuoStates.FirstOrDefaultAsync(db => db.Name == filterDto.State);
-            var city = await _context.ToDuoCity.FirstOrDefaultAsync(db => db.Name == filterDto.City);
+            var city = await _context.Adventures.FirstOrDefaultAsync(db => db.City.Trim() == filterDto.City.Trim());
 
             var tags = filterDto.Tags?.Split(new[] { ',', '(', ')' }, StringSplitOptions.RemoveEmptyEntries)
                                       .Select(tag => tag.Trim().Replace(" ", ""))
@@ -51,7 +51,7 @@ namespace ToDuoAPI.Repository
 
             if (city != null)
             {
-                query = query.Where(db => db.City == city.Id);
+                query = query.Where(db => db.City == filterDto.City.Trim());
             }
 
             if (tags != null && tags.Count > 0)
@@ -80,7 +80,7 @@ namespace ToDuoAPI.Repository
                 WebsiteURL = a.WebsiteURL,
                 CreatedDate = a.CreatedDate,
                 Address = a.Address,
-                City = a.ToDuoCity.Name,
+                City = a.City,
                 State = a.ToDuoStates.Name,
                 Tags = a.Tags,
                 Hours = a.Hours,

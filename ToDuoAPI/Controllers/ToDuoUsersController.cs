@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ToDuoAPI.Contracts;
 using ToDuoAPI.Data;
 using ToDuoAPI.Models;
+using ToDuoAPI.Models.DataTransferObjects;
 using ToDuoAPI.Service;
 
 namespace ToDuoAPI.Controllers
@@ -34,9 +35,9 @@ namespace ToDuoAPI.Controllers
 
         // GET: api/ToDuoUsers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ToDuoUsers>> GetToDuoUsers(int id)
+        public async Task<ActionResult<ToDuoBasicUsersDTO>> GetToDuoUsers(int id)
         {
-            var toDuoUsers = await _user.GetAsync(id);
+            var toDuoUsers = await _user.GetBasicUserById(id);
 
             if (toDuoUsers == null)
             {
@@ -82,34 +83,6 @@ namespace ToDuoAPI.Controllers
             }
 
             return NoContent();
-        }
-
-        // POST: api/ToDuoUsers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<ToDuoUsers>> PostToDuoUsers(ToDuoUsers toDuoUsers)
-        {
-            toDuoUsers =  await _user.SignUpNewUser(toDuoUsers);
-            return CreatedAtAction("GetToDuoUsers", new { id = toDuoUsers.Id }, toDuoUsers);
-        }
-
-
-        // POST: api/Login
-        [HttpPost]
-        [Route("login")]
-        public async Task<ActionResult<ToDuoUsers>> Login(Login login)
-        {
-            try
-            {
-                ToDuoUsers user = await _user.AuthenticateCredentials(login.Email, login.Password);
-                return user;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception details
-                // Return a more descriptive error message or HTTP status code
-                return StatusCode(500, ex.Message); // or return a custom error object
-            }
         }
 
 

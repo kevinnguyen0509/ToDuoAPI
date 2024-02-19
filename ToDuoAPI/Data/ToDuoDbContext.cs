@@ -17,7 +17,7 @@ namespace ToDuoAPI.Data
         public DbSet<Adventures> Adventures { get; set; }
         public DbSet<ToDuoCategory> ToDuoCategories { get; set; }
         public DbSet<ToDuoStates> ToDuoStates { get; set; }
-        public DbSet<ToDuoCity> ToDuoCity { get; set; }
+        public DbSet<ToDuoLikedAdventures> ToDuoLikedAdventures { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -12,6 +12,7 @@ using ToDuoAPI.Models;
 using ToDuoAPI.Models.DataTransferObjects;
 using ToDuoAPI.Repository;
 using ToDuoAPI.Service;
+using ToDuoAPI.Service.StoredProcedures;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,9 +47,11 @@ builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IAdventures, AdventuresRespository>();
 builder.Services.AddScoped<ICategory, CategoryRepository>();
-builder.Services.AddScoped<ICities, CityRepository>();
 builder.Services.AddScoped<IState, StateRepository>();
 builder.Services.AddScoped<IAuthManager, AuthManager>();
+builder.Services.AddScoped<ILikedAdventures, LikedAdventuresRepository>();
+builder.Services.AddScoped<IUser, ToDuoUserRepository>();
+builder.Services.AddScoped<AdventuresStoredProcedures>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -76,6 +79,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseSerilogRequestLogging();
 app.UseHttpsRedirection();

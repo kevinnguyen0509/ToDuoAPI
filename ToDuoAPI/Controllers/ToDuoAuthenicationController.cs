@@ -22,7 +22,7 @@ namespace ToDuoAPI.Controllers
         [Route("register")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Register([FromBody]ApiUserDTO apiUserDTO)
+        public async Task<ActionResult> Register([FromBody] ApiRegisterUserDTO apiUserDTO)
         {
             var errors = await _authManager.RegisterUser(apiUserDTO);
 

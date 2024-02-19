@@ -18,8 +18,7 @@ namespace ToDuoAPI.Models
         [MaxLength(100)]
         public string Address { get; set; }
 
-        [Required]
-        public int City { get; set; }
+        public string City { get; set; }
 
         [Required]
         public int ToDuoStatesID { get; set; }
@@ -41,8 +40,5 @@ namespace ToDuoAPI.Models
 
         [ForeignKey("ToDuoStatesID")]
         public virtual ToDuoStates ToDuoStates { get; set; }
-
-        [ForeignKey("City")]
-        public virtual ToDuoCity ToDuoCity { get; set; }
     }
 }

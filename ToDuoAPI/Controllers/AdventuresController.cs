@@ -17,7 +17,7 @@ namespace ToDuoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    /*[Authorize]*/
     public class AdventuresController : ControllerBase
     {
         private readonly ToDuoDbContext _context;

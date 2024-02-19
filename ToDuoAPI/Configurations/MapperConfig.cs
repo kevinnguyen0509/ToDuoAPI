@@ -11,6 +11,9 @@ namespace ToDuoAPI.Configurations
         {
             CreateMap<Adventures, AdventureDto>().ReverseMap();
             CreateMap<ToDuoUsers, ApiUserDTO>().ReverseMap();
+            CreateMap<ToDuoUsers, ApiRegisterUserDTO>().ReverseMap();
+            CreateMap<ToDuoUsers, ToDuoBasicUsersDTO>().ReverseMap();
+            CreateMap<AdventureBasicUserMatchDTO, ToDuoBasicUsersDTO>().ReverseMap();
         }
     }
 }

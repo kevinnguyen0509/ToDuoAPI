@@ -65,10 +65,12 @@ namespace ToDuoAPI.Repository
             return null;
         }
 
-        public async Task<IEnumerable<IdentityError>> RegisterUser(ApiUserDTO userDTO)
+        public async Task<IEnumerable<IdentityError>> RegisterUser(ApiRegisterUserDTO userDTO)
         {
             _user = _mapper.Map<ToDuoUsers>(userDTO);
             _user.UserName = _user.Email;
+            _user.FirstName = userDTO.FirstName;
+            _user.LastName = userDTO.LastName;
             var result = await _userManager.CreateAsync(_user, userDTO.Password);
 
             if(result.Succeeded)
