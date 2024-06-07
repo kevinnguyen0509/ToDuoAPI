@@ -41,7 +41,10 @@ namespace ToDuoAPI.Service.StoredProcedures
                         {
                             var matchUserDto = new MatchUserDTO
                             {
-                                Id = reader.GetInt32("Id"),
+                                AdventureId = reader.GetInt32("AdventureId"),
+                                Title = reader.IsDBNull(reader.GetOrdinal("Title")) ? "" : reader.GetString(reader.GetOrdinal("Title")),
+                                ImageURL = reader.IsDBNull(reader.GetOrdinal("ImageURL")) ? "" : reader.GetString(reader.GetOrdinal("ImageURL")),
+                                LikedAdventureId = reader.GetInt32("LikedAdventureId"),
                                 FirstName = reader.IsDBNull(reader.GetOrdinal("FirstName")) ? "" : reader.GetString(reader.GetOrdinal("FirstName")),
                                 LastName = reader.IsDBNull(reader.GetOrdinal("FirstName")) ? "" : reader.GetString(reader.GetOrdinal("LastName"))
                             };

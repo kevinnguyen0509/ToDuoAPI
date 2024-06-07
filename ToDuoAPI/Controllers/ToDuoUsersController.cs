@@ -47,7 +47,11 @@ namespace ToDuoAPI.Controllers
             return toDuoUsers;
         }
 
-
+        [HttpGet("getfriends/{id}")]
+        public async Task<ActionResult<ToDuoUsers>> GetFriends(int id)
+        {
+            return null;
+        }
 
         // PUT: api/ToDuoUsers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
